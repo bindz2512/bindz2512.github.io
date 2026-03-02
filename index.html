@@ -3,295 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Pixel Art Generator Pro</title>
+    <title>iOS Minecraft Architect</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Roboto:wght@300;700&display=swap');
+        /* iOS Style - San Francisco-like Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --ios-blur: blur(30px);
+            --ios-bg: rgba(255, 255, 255, 0.1);
+            --accent-color: #007AFF; /* Apple Blue */
+        }
 
         body {
             margin: 0; padding: 0; min-height: 100vh;
-            background: linear-gradient(135deg, #050505, #1a0a2e, #050505);
-            background-size: 400% 400%;
-            animation: waveBackground 15s ease infinite;
-            font-family: 'Roboto', sans-serif;
+            background: #000 url('https://w.wallhaven.cc/full/85/wallhaven-85m88y.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Inter', -apple-system, sans-serif;
             display: flex; justify-content: center; align-items: center;
-            color: white; overflow-x: hidden;
+            overflow: hidden;
         }
 
-        @keyframes waveBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Nền lướt sóng nhẹ nhàng kiểu Apple */
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(120deg, rgba(0,122,255,0.2), rgba(255,45,85,0.1));
+            z-index: -1; animation: bgWave 15s infinite alternate;
         }
 
-        /* Glassmorphism Pro Max */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(40px) saturate(180%);
-            -webkit-backdrop-filter: blur(40px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 40px;
-            padding: 50px;
-            width: 850px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(255,255,255,0.05);
-            z-index: 999;
-            position: relative;
+        @keyframes bgWave {
+            0% { opacity: 0.5; } 100% { opacity: 0.8; }
         }
 
-        /* Shader Text Lướt Sóng */
-        .shader-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
+        .ios-card {
+            background: var(--ios-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border-radius: 45px; /* Bo góc cực tròn kiểu iOS */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            width: 90%; max-width: 500px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            z-index: 100;
             text-align: center;
+        }
+
+        /* Chữ shader lướt sóng Pro Max */
+        .shader-title {
+            font-weight: 800; font-size: 2.2rem;
             margin-bottom: 30px;
-            background: linear-gradient(to right, #00f2fe 0%, #4facfe 25%, #7000ff 50%, #4facfe 75%, #00f2fe 100%);
+            background: linear-gradient(90deg, #fff, #007AFF, #fff);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shaderWave 3s linear infinite;
-            filter: drop-shadow(0 0 15px rgba(79, 172, 254, 0.6));
+            animation: textFlow 3s linear infinite;
         }
 
-        @keyframes shaderWave {
+        @keyframes textFlow {
             to { background-position: 200% center; }
         }
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
+        .menu-stack { display: flex; flex-direction: column; gap: 15px; text-align: left; }
 
-        .input-item { display: flex; flex-direction: column; gap: 10px; }
-        label { font-weight: 700; color: #4facfe; letter-spacing: 1px; font-size: 0.9rem;}
+        label { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-left: 15px; }
 
         input, select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            color: white;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 1rem;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #7000ff;
-            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
-            transform: scale(1.02);
-        }
-
-        .preview-area {
-            height: 200px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.02);
-            border: 2px dashed rgba(79, 172, 254, 0.3);
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 30px; overflow: hidden;
-        }
-
-        #pixelCanvas { max-height: 100%; image-rendering: pixelated; display: none; }
-
-        .btn-convert {
-            width: 100%;
-            padding: 20px;
-            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
             border: none;
-            background: linear-gradient(90deg, #7000ff, #4facfe);
-            color: white;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: 0.5s;
-            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.4);
+            padding: 16px 20px;
+            border-radius: 20px;
+            color: white; font-size: 1rem;
+            width: 100%; box-sizing: border-box;
+            outline: none; transition: 0.3s;
         }
 
-        .btn-convert:hover {
-            letter-spacing: 5px;
-            box-shadow: 0 15px 40px rgba(79, 172, 254, 0.6);
-            transform: translateY(-5px);
+        input:focus { background: rgba(255,255,255,0.2); box-shadow: 0 0 0 3px var(--accent-color); }
+
+        .preview-circle {
+            width: 120px; height: 120px; border-radius: 30px;
+            background: rgba(0,0,0,0.3); margin: 20px auto;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+        }
+        canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+
+        .btn-ios {
+            background: #fff; color: #000;
+            border: none; padding: 18px; border-radius: 22px;
+            width: 100%; font-weight: 700; font-size: 1.1rem;
+            margin-top: 25px; cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
         }
 
-        /* Loading Animation */
+        .btn-ios:active { transform: scale(0.96); background: rgba(255,255,255,0.8); }
+
+        /* Loading */
         #loader {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 10000;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 9999;
             flex-direction: column; justify-content: center; align-items: center;
         }
-        .bar-container { width: 300px; height: 6px; background: #222; border-radius: 10px; margin-top: 20px;}
-        .bar-fill { width: 0%; height: 100%; background: #4facfe; border-radius: 10px; box-shadow: 0 0 15px #4facfe; transition: 0.3s;}
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <h2 class="shader-title" style="font-size: 1.5rem;">ĐANG COMPILING...</h2>
-    <div class="bar-container"><div class="bar-fill" id="bar"></div></div>
+    <div class="spinner"></div>
+    <p style="margin-top:20px; font-weight:600;">Processing...</p>
 </div>
 
-<div class="glass-panel">
-    <h1 class="shader-title">MINECRAFT SHADER PRO</h1>
+<div class="ios-card">
+    <h1 class="shader-title">Converter Pro</h1>
     
-    <div class="menu-grid">
-        <div class="input-item">
-            <label>THIẾT BỊ (DEVICE)</label>
+    <div class="menu-stack">
+        <label>PROJECT NAME</label>
+        <input type="text" id="pName" placeholder="Tên Pack (không dấu/khoảng cách)">
+
+        <label>DEVICE & VERSION</label>
+        <div style="display:flex; gap:10px;">
             <select id="device">
-                <option value="pc">PC (Windows 10/11)</option>
-                <option value="adr">ANDROID</option>
-                <option value="ios">IOS (iPhone/iPad)</option>
+                <option value="ios">iOS</option>
+                <option value="pc">PC</option>
+                <option value="adr">Android</option>
+            </select>
+            <select id="ver">
+                <option value="1.21.0">1.21</option>
+                <option value="1.20.0">1.20</option>
             </select>
         </div>
-        <div class="input-item">
-            <label>PHIÊN BẢN (VERSION)</label>
-            <select id="mcVer">
-                <option value="1.18.0">Minecraft 1.18</option>
-                <option value="1.19.0">Minecraft 1.19</option>
-                <option value="1.20.0">Minecraft 1.20</option>
-                <option value="1.21.0">Minecraft 1.21</option>
-            </select>
+
+        <label>COORDINATES (X, Z)</label>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="posX" value="0">
+            <input type="number" id="posZ" value="0">
         </div>
-        <div class="input-item">
-            <label>TÊN PROJECT</label>
-            <input type="text" id="pName" placeholder="MyAwesomeArt">
-        </div>
-        <div class="input-item">
-            <label>ẢNH NGUỒN</label>
-            <input type="file" id="imgInp" accept="image/*">
-        </div>
-        <div class="input-item">
-            <label>TỌA ĐỘ X (Z tương ứng)</label>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="posX" value="0" placeholder="X">
-                <input type="number" id="posZ" value="0" placeholder="Z">
-            </div>
-        </div>
-        <div class="input-item">
-            <label>ĐỘ CAO Y (CỐ ĐỊNH)</label>
-            <input type="text" value="150" disabled>
-        </div>
+
+        <label>IMAGE SOURCE</label>
+        <input type="file" id="imgInp" accept="image/*">
     </div>
 
-    <div class="preview-area">
-        <span id="txt">PREVIEW PIXEL ART</span>
+    <div class="preview-circle">
         <canvas id="pixelCanvas"></canvas>
     </div>
 
-    <button class="btn-convert" onclick="process()">CONVERT NOW</button>
+    <button class="btn-ios" onclick="convert()">Convert to .mcpack</button>
 </div>
 
 <script>
-    const palette = [
-        {n:'white_concrete', r:207, g:213, b:214}, {n:'black_concrete', r:8, g:10, b:15},
-        {n:'red_concrete', r:142, g:32, b:32}, {n:'blue_concrete', r:45, g:47, b:143},
-        {n:'yellow_concrete', r:240, g:175, b:21}, {n:'lime_concrete', r:94, g:168, b:24}
-    ];
-
-    function getUUID() {
+    // UUID Generator (Unique every time)
+    function genUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
             const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     }
 
-    const imgInp = document.getElementById('imgInp');
     const canvas = document.getElementById('pixelCanvas');
     const ctx = canvas.getContext('2d');
+    const imgInp = document.getElementById('imgInp');
 
     imgInp.onchange = e => {
         const reader = new FileReader();
-        reader.onload = event => {
+        reader.onload = ev => {
             const img = new Image();
             img.onload = () => {
-                const size = 100; // Giới hạn size để mượt
-                canvas.width = size; canvas.height = size;
-                ctx.drawImage(img, 0, 0, size, size);
-                canvas.style.display = 'block';
-                document.getElementById('txt').style.display = 'none';
+                canvas.width = 64; canvas.height = 64;
+                ctx.drawImage(img, 0, 0, 64, 64);
             };
-            img.src = event.target.result;
+            img.src = ev.target.result;
         };
         reader.readAsDataURL(e.target.files[0]);
     };
 
-    async function process() {
-        if(!imgInp.files[0]) return alert("Chọn ảnh cái đã!");
-        
-        const loader = document.getElementById('loader');
-        const bar = document.getElementById('bar');
-        loader.style.display = 'flex';
-        
-        const pName = document.getElementById('pName').value || "PixelArt";
-        const device = document.getElementById('device').value;
-        const ver = document.getElementById('mcVer').value.split('.').map(Number);
+    async function convert() {
+        if(!imgInp.files[0]) return alert("Chọn ảnh!");
+        document.getElementById('loader').style.display = 'flex';
+
+        const pName = document.getElementById('pName').value.toLowerCase().replace(/\s/g, '_') || "pixel_art";
         const startX = parseInt(document.getElementById('posX').value);
         const startZ = parseInt(document.getElementById('posZ').value);
-        const randomFileName = "build_" + Math.random().toString(36).substring(7);
-
-        const zip = new JSZip();
+        const mcVer = document.getElementById('ver').value.split('.').map(Number);
         
-        // 1. Tạo file xây dựng pixel chính
-        bar.style.width = "30%";
-        let commands = [];
-        const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-        for(let y=0; y<canvas.height; y++){
-            for(let x=0; x<canvas.width; x++){
-                const i = (y*canvas.width+x)*4;
+        const zip = new JSZip();
+        const functions = zip.folder("functions");
+
+        // --- 1. Tạo file pixel chính ---
+        let cmds = [];
+        const data = ctx.getImageData(0,0,64,64).data;
+        // Map màu đơn giản (Ví dụ: len trắng)
+        for(let y=0; y<64; y++){
+            for(let x=0; x<64; x++){
+                const i = (y*64+x)*4;
                 if(data[i+3] < 128) continue;
-                let best = palette[0], min = Infinity;
-                palette.forEach(b => {
-                    let d = Math.hypot(data[i]-b.r, data[i+1]-b.g, data[i+2]-b.b);
-                    if(d < min) { min = d; best = b; }
-                });
-                commands.push(`setblock ${startX + x} 150 ${startZ + y} ${best.n}`);
+                cmds.push(`setblock ${startX+x} 150 ${startZ+y} concrete ${Math.floor(Math.random()*15)}`);
             }
         }
+        // Lưu <tên_bất_kỳ>.mcfunction vào folder functions
+        functions.file(`${pName}.mcfunction`, cmds.join('\n'));
 
-        const funcs = zip.folder("functions");
-        funcs.file(`${randomFileName}.mcfunction`, commands.join('\n'));
+        // --- 2. run_all.mcfunction ---
+        functions.file("run_all.mcfunction", `function ${pName}`);
 
-        // 2. run_all.mcfunction
-        funcs.file("run_all.mcfunction", `function ${randomFileName}`);
+        // --- 3. tick.mcfunction (Sửa: Gọi trực tiếp file pixel) ---
+        functions.file("tick.mcfunction", `execute @a[tag=!built] ~ ~ ~ function ${pName}\ntag @a[tag=!built] add built`);
 
-        // 3. tick.mcfunction (Logic: Chạy 1 lần duy nhất bằng tag)
-        funcs.file("tick.mcfunction", `execute @a[tag=!built] ~ ~ ~ function run_all\ntag @a[tag=!built] add built`);
+        // --- 4. tick.json (Cấu trúc bắt buộc để game nhận diện) ---
+        functions.file("tick.json", JSON.stringify({"values":["tick"]}, null, 4));
 
-        // 4. tick.json
-        funcs.file("tick.json", JSON.stringify({"values":["tick"]}, null, 4));
-
-        // 5. Manifest.json (Custom theo Device)
-        bar.style.width = "60%";
+        // --- 5. Manifest.json (UUID Random) ---
         const manifest = {
             format_version: 2,
             header: {
-                name: `${pName} (${device.toUpperCase()})`,
-                description: "AI Generated Pixel Art",
-                uuid: getUUID(),
+                name: pName,
+                description: "iOS Style Pixel Art Pack",
+                uuid: genUUID(),
                 version: [1, 0, 0],
-                min_engine_version: ver
+                min_engine_version: mcVer
             },
             modules: [{
                 type: "data",
-                uuid: getUUID(),
+                uuid: genUUID(),
                 version: [1, 0, 0]
             }]
         };
         zip.file("manifest.json", JSON.stringify(manifest, null, 4));
 
-        // Đóng gói mcpack
-        bar.style.width = "90%";
-        const content = await zip.generateAsync({type:"blob"});
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(content);
-        link.download = `${pName}.mcpack`;
-        link.click();
-
-        bar.style.width = "100%";
-        setTimeout(() => loader.style.display = 'none', 500);
+        const blob = await zip.generateAsync({type:"blob"});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${pName}.mcpack`;
+        a.click();
+        
+        document.getElementById('loader').style.display = 'none';
     }
 </script>
 </body>
