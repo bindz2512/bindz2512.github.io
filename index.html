@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Pixel Art Pro Max</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        /* ================= CƠ BẢN VÀ NỀN LƯỚT SÓNG ================= */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
+        
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
+            background-size: 400% 400%;
+            animation: gradientWave 10s ease infinite;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes gradientWave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ================= GIAO DIỆN BO GÓC BÓNG KÍNH (GLASSMORPHISM) ================= */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* ================= HIỆU ỨNG CHỮ SHADER & LƯỚT SÓNG ================= */
+        .shader-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 0;
+            background: linear-gradient(90deg, #ff00cc, #333399, #00c6ff, #ff00cc);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(255, 0, 204, 0.5);
+            animation: textWaveShader 4s ease-in-out infinite;
+        }
+
+        @keyframes textWaveShader {
+            0% { background-position: 0% 50%; transform: translateY(0px); filter: drop-shadow(0 0 10px rgba(255,0,204,0.6));}
+            50% { background-position: 100% 50%; transform: translateY(-10px); filter: drop-shadow(0 0 25px rgba(0,198,255,0.8));}
+            100% { background-position: 0% 50%; transform: translateY(0px); filter: drop-shadow(0 0 10px rgba(255,0,204,0.6));}
+        }
+
+        /* ================= CÁC Ô NHẬP LIỆU ================= */
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .row { display: flex; gap: 20px; }
+        .row > * { flex: 1; }
+
+        label { font-weight: bold; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        input:focus, select:focus {
+            border-color: #00c6ff;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.5), inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* ================= KHU VỰC HIỂN THỊ ẢNH ================= */
+        .preview-box {
+            width: 100%;
+            height: 250px;
+            border-radius: 15px;
+            border: 2px dashed rgba(255,255,255,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
+        canvas { max-width: 100%; max-height: 100%; display: none; border-radius: 10px; }
+
+        /* ================= NÚT CONVERT ================= */
+        .btn-convert {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 114, 255, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .btn-convert:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 114, 255, 0.7);
+        }
+
+        /* ================= THANH LOADING ================= */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .progress-bar {
+            width: 80%; height: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #ff00cc, #00c6ff);
+            transition: width 0.2s ease;
+            box-shadow: 0 0 10px #00c6ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <div class="loading-overlay" id="loadingOverlay">
+            <h2 class="shader-text" style="font-size: 1.5rem;">ĐANG TẠO MCPACK...</h2>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <p id="loadingText">Khởi tạo...</p>
+        </div>
+
+        <h1 class="shader-text">PIXEL ART PRO MAX</h1>
+
+        <div class="input-group">
+            <label>1. Chọn ảnh (Sẽ được thu nhỏ tự động để tránh lag)</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label>2. Tên Project</label>
+                <input type="text" id="projectName" placeholder="Ví dụ: MyArt">
+            </div>
+            <div class="input-group">
+                <label>3. Phiên bản Minecraft</label>
+                <select id="mcVersion">
+                    <option value="1.18.0">1.18.x</option>
+                    <option value="1.19.0">1.19.x</option>
+                    <option value="1.20.0">1.20.x</option>
+                    <option value="1.21.0">1.21.x</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label>Tọa độ X</label>
+                <input type="number" id="coordX" value="0">
+            </div>
+            <div class="input-group">
+                <label>Tọa độ Y (Cố định)</label>
+                <input type="number" value="150" disabled style="opacity: 0.7;">
+            </div>
+            <div class="input-group">
+                <label>Tọa độ Z</label>
+                <input type="number" id="coordZ" value="0">
+            </div>
+        </div>
+
+        <div class="preview-box">
+            <span id="previewPlaceholder" style="opacity: 0.5;">Chưa có ảnh</span>
+            <canvas id="canvasPreview"></canvas>
+        </div>
+
+        <button class="btn-convert" onclick="startConversion()">⚡ CONVERT THÀNH MCPACK ⚡</button>
+    </div>
+
+    <script>
+        // Bảng màu Block cơ bản của Minecraft (Hệ thống Auto chọn block phù hợp)
+        const blockPalette = [
+            { name: 'white_concrete', rgb: [207, 213, 214] },
+            { name: 'black_concrete', rgb: [8, 10, 15] },
+            { name: 'red_concrete', rgb: [142, 32, 32] },
+            { name: 'blue_concrete', rgb: [45, 47, 143] },
+            { name: 'green_concrete', rgb: [73, 91, 36] },
+            { name: 'yellow_concrete', rgb: [240, 175, 21] },
+            { name: 'orange_concrete', rgb: [224, 97, 0] },
+            { name: 'light_blue_concrete', rgb: [35, 137, 198] },
+            { name: 'lime_concrete', rgb: [94, 168, 24] },
+            { name: 'pink_concrete', rgb: [213, 101, 142] },
+            { name: 'purple_concrete', rgb: [100, 31, 156] },
+            { name: 'cyan_concrete', rgb: [21, 119, 136] },
+            { name: 'gray_concrete', rgb: [54, 57, 61] },
+            { name: 'light_gray_concrete', rgb: [125, 125, 115] },
+            { name: 'brown_concrete', rgb: [96, 59, 31] }
+        ];
+
+        // Tìm block gần giống màu nhất (Khoảng cách Euclidean)
+        function getClosestBlock(r, g, b) {
+            let closest = blockPalette[0];
+            let minDistance = Infinity;
+            for (let block of blockPalette) {
+                let dist = Math.sqrt(Math.pow(r - block.rgb[0], 2) + Math.pow(g - block.rgb[1], 2) + Math.pow(b - block.rgb[2], 2));
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closest = block;
+                }
+            }
+            return closest.name;
+        }
+
+        // Tạo UUID ngẫu nhiên MỚI hoàn toàn cho mỗi file (Đáp ứng bộ nhớ của người dùng)
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Random chuỗi cho tên file mcfunction
+        function generateRandomName() {
+            return 'pixelart_' + Math.random().toString(36).substring(2, 8);
+        }
+
+        const imageInput = document.getElementById('imageInput');
+        const canvas = document.getElementById('canvasPreview');
+        const ctx = canvas.getContext('2d');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+        // Xử lý khi chọn ảnh
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // Giới hạn kích thước ảnh tối đa 64x64 để không làm crash game/trình duyệt
+                    const MAX_SIZE = 64;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > MAX_SIZE || height > MAX_SIZE) {
+                        const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
+                        width = Math.floor(width * ratio);
+                        height = Math.floor(height * ratio);
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // Hàm chính chạy tiến trình Convert
+        async function startConversion() {
+            const projName = document.getElementById('projectName').value || "PixelProject";
+            const mcVersion = document.getElementById('mcVersion').value.split('.').map(Number);
+            const startX = parseInt(document.getElementById('coordX').value) || 0;
+            const startZ = parseInt(document.getElementById('coordZ').value) || 0;
+            const fixedY = 150;
+
+            if (canvas.style.display === 'none') {
+                alert("Vui lòng chọn ảnh trước!");
+                return;
+            }
+
+            // Giao diện loading
+            const overlay = document.getElementById('loadingOverlay');
+            const progressFill = document.getElementById('progressFill');
+            const loadingText = document.getElementById('loadingText');
+            overlay.classList.add('active');
+
+            progressFill.style.width = '10%';
+            loadingText.innerText = "Đang khởi tạo JSZip...";
+            await new Promise(r => setTimeout(r, 500)); // Smooth effect
+
+            const zip = new JSZip();
+
+            progressFill.style.width = '30%';
+            loadingText.innerText = "Đang phân tích Pixel & tạo Command Block...";
+            await new Promise(r => setTimeout(r, 500));
+
+            // Đọc pixel từ Canvas
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imgData.data;
+            let commands = [];
+
+            // Duyệt từng pixel và chuyển thành lệnh setblock
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const idx = (y * canvas.width + x) * 4;
+                    const r = pixels[idx];
+                    const g = pixels[idx + 1];
+                    const b = pixels[idx + 2];
+                    const a = pixels[idx + 3];
+
+                    if (a > 128) { // Bỏ qua pixel trong suốt
+                        const blockName = getClosestBlock(r, g, b);
+                        // Đặt block nằm ngang (trải trên trục X và Z)
+                        const blockX = startX + x;
+                        const blockZ = startZ + y; 
+                        commands.push(`setblock ${blockX} ${fixedY} ${blockZ} ${blockName}`);
+                    }
+                }
+            }
+
+            progressFill.style.width = '60%';
+            loadingText.innerText = "Đang tạo cấu trúc Pack & Manifest (Random UUID)...";
+            await new Promise(r => setTimeout(r, 500));
+
+            // 1. & 4. Tạo tên file bất kỳ.mcfunction và đưa vào thư mục functions
+            const randomFuncName = generateRandomName();
+            const functionsFolder = zip.folder("functions");
+            functionsFolder.file(`${randomFuncName}.mcfunction`, commands.join('\n'));
+
+            // 2. Tạo manifest.json (Sử dụng UUID mới hoàn toàn cho mỗi file)
+            const manifest = {
+                "format_version": 2,
+                "header": {
+                    "name": projName,
+                    "description": "Auto-generated Pixel Art Pack",
+                    "uuid": generateUUID(), // UUID mới 1
+                    "version": [1, 0, 0],
+                    "min_engine_version": mcVersion
+                },
+                "modules": [
+                    {
+                        "type": "data",
+                        "uuid": generateUUID(), // UUID mới 2
+                        "version": [1, 0, 0]
+                    }
+                ]
+            };
+            zip.file("manifest.json", JSON.stringify(manifest, null, 4));
+
+            // 3. Tạo các file run_all, tick
+            functionsFolder.file("run_all.mcfunction", `function ${randomFuncName}\ntellraw @a {"rawtext":[{"text":"§aĐã chạy xong Pixel Art!"}]}`);
+            
+            const tickJson = { "values": ["tick"] };
+            functionsFolder.file("tick.json", JSON.stringify(tickJson, null, 4));
+            
+            // tick.mcfunction gọi run_all (hoặc có thể để logic tùy ý)
+            functionsFolder.file("tick.mcfunction", "# System tick file\n# Remove comment below to loop run_all (Not recommended for pixel art)\n# function run_all");
+
+            progressFill.style.width = '90%';
+            loadingText.innerText = "Đang đóng gói thành mcpack...";
+
+            // 5. Xuất thành file .mcpack
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                progressFill.style.width = '100%';
+                loadingText.innerText = "Hoàn tất!";
+                
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${projName}.mcpack`;
+                    link.click();
+                    
+                    // Ẩn loading
+                    overlay.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>
