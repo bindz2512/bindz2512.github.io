@@ -3,244 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iOS Minecraft Architect</title>
+    <title>Minecraft Pixel Architect Pro Max</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* iOS Style - San Francisco-like Font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        /* FONTS & CORE */
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;700;900&family=Montserrat:wght@900&display=swap');
 
         :root {
-            --ios-blur: blur(30px);
-            --ios-bg: rgba(255, 255, 255, 0.1);
-            --accent-color: #007AFF; /* Apple Blue */
+            --ios-accent: #007AFF;
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
         }
 
-        body {
+        body, html {
             margin: 0; padding: 0; min-height: 100vh;
-            background: #000 url('https://w.wallhaven.cc/full/85/wallhaven-85m88y.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, sans-serif;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden;
+            color: white; overflow: hidden;
+            background: #000;
         }
 
-        /* Nền lướt sóng nhẹ nhàng kiểu Apple */
-        body::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(120deg, rgba(0,122,255,0.2), rgba(255,45,85,0.1));
-            z-index: -1; animation: bgWave 15s infinite alternate;
+        /* NỀN LƯỚT SÓNG NHẸ (WAVE BACKGROUND) */
+        .background {
+            position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 70%);
+            z-index: -1;
+        }
+        .wave-layer {
+            position: absolute; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png');
+            opacity: 0.05; animation: waveMove 20s linear infinite;
+        }
+        @keyframes waveMove { 
+            from { transform: translate(0,0); } to { transform: translate(100px, 100px); } 
         }
 
-        @keyframes bgWave {
-            0% { opacity: 0.5; } 100% { opacity: 0.8; }
-        }
-
-        .ios-card {
-            background: var(--ios-bg);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border-radius: 45px; /* Bo góc cực tròn kiểu iOS */
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        /* GIAO DIỆN BÓNG KÍNH iOS (GLASSMORPHISM) */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(50px) saturate(200%);
+            -webkit-backdrop-filter: blur(50px) saturate(200%);
+            border: 1px solid var(--border);
+            border-radius: 50px;
             padding: 40px;
-            width: 90%; max-width: 500px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-            z-index: 100;
-            text-align: center;
+            width: 500px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
+            z-index: 10; position: relative;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Chữ shader lướt sóng Pro Max */
-        .shader-title {
-            font-weight: 800; font-size: 2.2rem;
-            margin-bottom: 30px;
-            background: linear-gradient(90deg, #fff, #007AFF, #fff);
-            background-size: 200% auto;
+        /* CHỮ SHADER LƯỚT SÓNG PRO MAX */
+        .shader-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem; text-align: center;
+            background: linear-gradient(90deg, #fff, var(--ios-accent), #ff007f, #fff);
+            background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: textFlow 3s linear infinite;
+            animation: shaderFlow 4s linear infinite;
+            margin-bottom: 25px; filter: drop-shadow(0 0 15px rgba(0,122,255,0.4));
         }
+        @keyframes shaderFlow { to { background-position: 300% center; } }
 
-        @keyframes textFlow {
-            to { background-position: 200% center; }
-        }
-
-        .menu-stack { display: flex; flex-direction: column; gap: 15px; text-align: left; }
-
-        label { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-left: 15px; }
-
+        /* FORM NỀN TẢNG */
+        .menu { display: flex; flex-direction: column; gap: 15px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        label { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-left: 15px; text-transform: uppercase; }
+        
         input, select {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            padding: 16px 20px;
-            border-radius: 20px;
-            color: white; font-size: 1rem;
-            width: 100%; box-sizing: border-box;
-            outline: none; transition: 0.3s;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            padding: 16px; border-radius: 22px;
+            color: #fff; width: 100%; box-sizing: border-box;
+            outline: none; transition: 0.3s; font-size: 1rem;
         }
+        input:focus { border-color: var(--ios-accent); background: rgba(0,0,0,0.5); }
 
-        input:focus { background: rgba(255,255,255,0.2); box-shadow: 0 0 0 3px var(--accent-color); }
-
-        .preview-circle {
-            width: 120px; height: 120px; border-radius: 30px;
-            background: rgba(0,0,0,0.3); margin: 20px auto;
+        /* PIXEL PREVIEW */
+        .preview-container {
+            width: 140px; height: 140px; border-radius: 30px;
+            background: rgba(0,0,0,0.5); margin: 20px auto;
+            border: 1px solid var(--border); overflow: hidden;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
         }
         canvas { width: 100%; height: 100%; image-rendering: pixelated; }
 
+        /* NÚT CONVERT */
         .btn-ios {
             background: #fff; color: #000;
-            border: none; padding: 18px; border-radius: 22px;
-            width: 100%; font-weight: 700; font-size: 1.1rem;
-            margin-top: 25px; cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            border: none; padding: 20px; border-radius: 25px;
+            font-weight: 800; font-size: 1.1rem; cursor: pointer;
+            width: 100%; transition: all 0.3s; margin-top: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
+        .btn-ios:hover { transform: scale(1.02); background: #f0f0f0; }
+        .btn-ios:active { transform: scale(0.97); }
 
-        .btn-ios:active { transform: scale(0.96); background: rgba(255,255,255,0.8); }
+        /* LOADING & TP POPUP */
+        #loadingOverlay, #tpPopup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .progress-bar { width: 250px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--ios-accent); transition: 0.2s; box-shadow: 0 0 15px var(--ios-accent); }
 
-        /* Loading */
-        #loader {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 9999;
-            flex-direction: column; justify-content: center; align-items: center;
+        .popup-box {
+            background: #1c1c1e; padding: 30px; border-radius: 35px; width: 320px;
+            text-align: center; border: 1px solid var(--ios-accent);
         }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
-            border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <div class="spinner"></div>
-    <p style="margin-top:20px; font-weight:600;">Processing...</p>
+<div class="background"><div class="wave-layer"></div></div>
+
+<div class="glass-card">
+    <h1 class="shader-text">ARCHITECT PRO</h1>
+
+    <div class="menu">
+        <div>
+            <label>1. Tên Project</label>
+            <input type="text" id="projName" placeholder="my_pixel_art">
+        </div>
+
+        <div class="row">
+            <div>
+                <label>2. Tọa độ X1 (Bắt đầu)</label>
+                <input type="number" id="x1" value="100">
+            </div>
+            <div>
+                <label>3. Tọa độ Z1 (Bắt đầu)</label>
+                <input type="number" id="z1" value="100">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>4. Tọa độ X2 (Vùng kết thúc)</label>
+                <input type="number" id="x2" value="164">
+            </div>
+            <div>
+                <label>5. Tọa độ Z2 (Vùng kết thúc)</label>
+                <input type="number" id="z2" value="164">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>Phiên bản MC</label>
+                <select id="ver">
+                    <option value="1.21.0">1.21</option>
+                    <option value="1.20.0">1.20</option>
+                    <option value="1.19.0">1.19</option>
+                </select>
+            </div>
+            <div>
+                <label>Thiết bị</label>
+                <select id="device">
+                    <option value="ios">iOS / iPadOS</option>
+                    <option value="pc">PC (Windows)</option>
+                    <option value="adr">Android</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label>6. Chọn Ảnh Nguồn</label>
+            <input type="file" id="imgInput" accept="image/*">
+        </div>
+
+        <div class="preview-container">
+            <canvas id="pixelCanvas"></canvas>
+        </div>
+
+        <button class="btn-ios" onclick="processConversion()">⚡ CONVERT TO MCPACK</button>
+    </div>
 </div>
 
-<div class="ios-card">
-    <h1 class="shader-title">Converter Pro</h1>
-    
-    <div class="menu-stack">
-        <label>PROJECT NAME</label>
-        <input type="text" id="pName" placeholder="Tên Pack (không dấu/khoảng cách)">
+<div id="loadingOverlay">
+    <h2 class="shader-text" style="font-size: 1.5rem;">COMPILING PACK...</h2>
+    <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+</div>
 
-        <label>DEVICE & VERSION</label>
-        <div style="display:flex; gap:10px;">
-            <select id="device">
-                <option value="ios">iOS</option>
-                <option value="pc">PC</option>
-                <option value="adr">Android</option>
-            </select>
-            <select id="ver">
-                <option value="1.21.0">1.21</option>
-                <option value="1.20.0">1.20</option>
-            </select>
-        </div>
-
-        <label>COORDINATES (X, Z)</label>
-        <div style="display:flex; gap:10px;">
-            <input type="number" id="posX" value="0">
-            <input type="number" id="posZ" value="0">
-        </div>
-
-        <label>IMAGE SOURCE</label>
-        <input type="file" id="imgInp" accept="image/*">
+<div id="tpPopup">
+    <div class="popup-box">
+        <h3 style="color: var(--ios-accent);">THÀNH CÔNG!</h3>
+        <p style="font-size: 0.8rem; opacity: 0.7;">Lệnh TP tới vùng xây dựng:</p>
+        <code id="tpCommand" style="display:block; background:#000; padding:10px; border-radius:10px; margin: 15px 0; color:#00ff00; font-size: 11px;"></code>
+        <button class="btn-ios" onclick="location.reload()" style="padding:10px;">ĐÓNG</button>
     </div>
-
-    <div class="preview-circle">
-        <canvas id="pixelCanvas"></canvas>
-    </div>
-
-    <button class="btn-ios" onclick="convert()">Convert to .mcpack</button>
 </div>
 
 <script>
-    // UUID Generator (Unique every time)
-    function genUUID() {
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx = canvas.getContext('2d');
+    const imgInp = document.getElementById('imgInput');
+
+    // UUID ngẫu nhiên theo yêu cầu lưu trữ
+    function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
             const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     }
 
-    const canvas = document.getElementById('pixelCanvas');
-    const ctx = canvas.getContext('2d');
-    const imgInp = document.getElementById('imgInp');
-
     imgInp.onchange = e => {
         const reader = new FileReader();
         reader.onload = ev => {
             const img = new Image();
             img.onload = () => {
-                canvas.width = 64; canvas.height = 64;
-                ctx.drawImage(img, 0, 0, 64, 64);
+                // Tính toán kích thước dựa trên vùng tọa độ
+                const w = Math.abs(document.getElementById('x2').value - document.getElementById('x1').value);
+                const h = Math.abs(document.getElementById('z2').value - document.getElementById('z1').value);
+                canvas.width = Math.min(w || 64, 128);
+                canvas.height = Math.min(h || 64, 128);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             };
             img.src = ev.target.result;
         };
         reader.readAsDataURL(e.target.files[0]);
     };
 
-    async function convert() {
-        if(!imgInp.files[0]) return alert("Chọn ảnh!");
-        document.getElementById('loader').style.display = 'flex';
+    async function processConversion() {
+        if(!imgInp.files[0]) return alert("Vui lòng chọn ảnh!");
+        
+        const overlay = document.getElementById('loadingOverlay');
+        const fill = document.getElementById('pFill');
+        overlay.style.display = 'flex';
 
-        const pName = document.getElementById('pName').value.toLowerCase().replace(/\s/g, '_') || "pixel_art";
-        const startX = parseInt(document.getElementById('posX').value);
-        const startZ = parseInt(document.getElementById('posZ').value);
+        const pName = document.getElementById('projName').value.toLowerCase().replace(/\s/g, '_') || "pixel_pack";
+        const x1 = parseInt(document.getElementById('x1').value);
+        const z1 = parseInt(document.getElementById('z1').value);
+        const x2 = parseInt(document.getElementById('x2').value);
+        const z2 = parseInt(document.getElementById('z2').value);
         const mcVer = document.getElementById('ver').value.split('.').map(Number);
         
         const zip = new JSZip();
         const functions = zip.folder("functions");
 
-        // --- 1. Tạo file pixel chính ---
+        // 1. Tạo file mcfunction chính xây dựng theo vùng
+        fill.style.width = "30%";
         let cmds = [];
-        const data = ctx.getImageData(0,0,64,64).data;
-        // Map màu đơn giản (Ví dụ: len trắng)
-        for(let y=0; y<64; y++){
-            for(let x=0; x<64; x++){
-                const i = (y*64+x)*4;
-                if(data[i+3] < 128) continue;
-                cmds.push(`setblock ${startX+x} 150 ${startZ+y} concrete ${Math.floor(Math.random()*15)}`);
+        const imgData = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+        
+        const stepX = x2 >= x1 ? 1 : -1;
+        const stepZ = z2 >= z1 ? 1 : -1;
+
+        for(let y=0; y<canvas.height; y++){
+            for(let x=0; x<canvas.width; x++){
+                const i = (y * canvas.width + x) * 4;
+                if(imgData[i+3] < 128) continue; // Skip trong suốt
+
+                // Thuật toán chọn Block bê tông phù hợp (Auto-select)
+                const r = imgData[i], g = imgData[i+1], b = imgData[i+2];
+                let block = "concrete 0"; // White
+                if(r < 60 && g < 60 && b < 60) block = "concrete 15"; // Black
+                else if(r > 150 && g < 100 && b < 100) block = "concrete 14"; // Red
+                else if(b > 150 && r < 100) block = "concrete 11"; // Blue
+                else if(g > 150 && b < 100) block = "concrete 13"; // Green
+                else if(r > 200 && g > 200 && b < 100) block = "concrete 4"; // Yellow
+
+                cmds.push(`setblock ${x1 + (x * stepX)} 150 ${z1 + (y * stepZ)} ${block}`);
             }
         }
-        // Lưu <tên_bất_kỳ>.mcfunction vào folder functions
         functions.file(`${pName}.mcfunction`, cmds.join('\n'));
 
-        // --- 2. run_all.mcfunction ---
+        // 2. run_all.mcfunction
+        fill.style.width = "50%";
         functions.file("run_all.mcfunction", `function ${pName}`);
 
-        // --- 3. tick.mcfunction (Sửa: Gọi trực tiếp file pixel) ---
+        // 3. tick.mcfunction (Logic tag của người dùng)
         functions.file("tick.mcfunction", `execute @a[tag=!built] ~ ~ ~ function ${pName}\ntag @a[tag=!built] add built`);
 
-        // --- 4. tick.json (Cấu trúc bắt buộc để game nhận diện) ---
+        // 4. tick.json
         functions.file("tick.json", JSON.stringify({"values":["tick"]}, null, 4));
 
-        // --- 5. Manifest.json (UUID Random) ---
+        // 5. Manifest (UUID MỚI)
+        fill.style.width = "80%";
         const manifest = {
             format_version: 2,
             header: {
-                name: pName,
-                description: "iOS Style Pixel Art Pack",
-                uuid: genUUID(),
+                name: pName.toUpperCase(),
+                description: "Pro Max Area Build System",
+                uuid: generateUUID(),
                 version: [1, 0, 0],
                 min_engine_version: mcVer
             },
             modules: [{
                 type: "data",
-                uuid: genUUID(),
+                uuid: generateUUID(),
                 version: [1, 0, 0]
             }]
         };
         zip.file("manifest.json", JSON.stringify(manifest, null, 4));
 
+        // Xuất file
         const blob = await zip.generateAsync({type:"blob"});
-        const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
+        a.href = URL.createObjectURL(blob);
         a.download = `${pName}.mcpack`;
         a.click();
-        
-        document.getElementById('loader').style.display = 'none';
+
+        // Hoàn tất
+        fill.style.width = "100%";
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('tpCommand').innerText = `/tp @s ${x1} 152 ${z1}`;
+            document.getElementById('tpPopup').style.display = 'flex';
+        }, 500);
     }
 </script>
 </body>
