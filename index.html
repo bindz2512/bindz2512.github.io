@@ -3,305 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft 3D Architect Pro</title>
+    <title>Minecraft Disc Maker - Fix Select File</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;700;900&family=Montserrat:wght@900&display=swap');
-
-        :root {
-            --ios-blue: #007AFF;
-            --glass: rgba(255, 255, 255, 0.08);
-            --border: rgba(255, 255, 255, 0.15);
-        }
-
-        body, html {
-            margin: 0; padding: 0; min-height: 100vh;
-            font-family: 'SF Pro Display', -apple-system, sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            color: white; overflow-x: hidden; background: #000;
-        }
-
-        /* NỀN SÓNG NHẸ */
-        .bg-gradient {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #1c1c1e 0%, #000 100%);
-            z-index: -1;
-        }
-
-        /* GIAO DIỆN GLASSMORPHISM */
-        .main-container {
-            background: var(--glass);
-            backdrop-filter: blur(40px) saturate(180%);
-            -webkit-backdrop-filter: blur(40px) saturate(180%);
-            border: 1px solid var(--border);
-            border-radius: 45px;
-            padding: 30px;
-            width: 900px;
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 30px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.7);
-            z-index: 10;
-        }
-
-        /* SHADER TEXT */
-        .shader-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
-            background: linear-gradient(90deg, #fff, var(--ios-blue), #5856D6, #fff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: flow 3s linear infinite;
-            text-align: center; grid-column: span 2;
-        }
-        @keyframes flow { to { background-position: 200% center; } }
-
-        /* MENU BÊN TRÁI */
-        .menu-side { display: flex; flex-direction: column; gap: 12px; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; padding-left: 10px; }
-        
-        input, select {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-            padding: 12px; border-radius: 18px; color: #fff; font-size: 14px; outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: var(--ios-blue); background: rgba(0,0,0,0.5); }
-
-        /* KHÔNG GIAN 3D PREVIEW */
-        .preview-side {
-            position: relative;
-            background: rgba(0,0,0,0.4);
-            border-radius: 35px;
-            border: 1px solid var(--border);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            overflow: hidden; cursor: grab;
-        }
-        .preview-side:active { cursor: grabbing; }
-        #canvas3D { width: 100%; height: 400px; }
-        .hint-3d { position: absolute; bottom: 15px; font-size: 11px; opacity: 0.5; pointer-events: none; }
-
-        /* BUTTON */
-        .btn-convert {
-            background: #fff; color: #000; border: none;
-            padding: 18px; border-radius: 22px; font-weight: 800;
-            font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
-        .btn-convert:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-
-        /* TP POPUP */
-        #tpOverlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.9); z-index: 1000; display: none;
-            justify-content: center; align-items: center;
-        }
-        .popup {
-            background: #1c1c1e; padding: 30px; border-radius: 35px;
-            border: 1px solid var(--ios-blue); text-align: center; width: 300px;
-        }
-    </code-box>
+        @import url('https://fonts.cdnfonts.com/css/minecraft-ia');
+        body { background: #313131; color: white; font-family: 'Minecraftia', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #c6c6c6; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff; padding: 20px; width: 90%; max-width: 500px; box-shadow: 8px 8px 0px rgba(0,0,0,0.4); }
+        h1 { color: #3f3f3f; text-shadow: 2px 2px #fff; text-align: center; font-size: 0.9rem; margin-bottom: 15px; }
+        .section { background: #8b8b8b; border: 2px solid #373737; border-top-color: #fff; border-left-color: #fff; padding: 12px; margin-bottom: 10px; color: #000; }
+        label { display: block; margin-bottom: 5px; font-size: 0.75rem; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 10px; background: #000; border: 2px solid #fff; color: #3cf03c; font-family: 'Minecraftia', sans-serif; box-sizing: border-box; font-size: 0.8rem; }
+        /* Tùy chỉnh nút chọn file cho dễ bấm */
+        .file-input-wrapper { margin-top: 5px; }
+        input[type="file"] { width: 100%; color: #000; font-size: 0.7rem; background: #eee; padding: 5px; border: 1px inset #000; }
+        .disc-preview-box { display: flex; align-items: center; gap: 15px; margin-top: 10px; }
+        .disc-icon { width: 42px; height: 42px; image-rendering: pixelated; background: #555; border: 2px solid #000; padding: 4px; }
+        button#craft { width: 100%; padding: 15px; background: #3c8527; border: 3px solid #000; border-top-color: #5fb343; border-left-color: #5fb343; color: white; font-family: 'Minecraftia', sans-serif; cursor: pointer; margin-top: 10px; text-shadow: 2px 2px #000; }
+        button#craft:active { border-top-color: #000; border-left-color: #000; background: #2d661e; }
+        #status { text-align: center; font-size: 0.65rem; margin-top: 10px; color: #444; }
     </style>
 </head>
 <body>
 
-<div class="bg-gradient"></div>
+<div class="container">
+    <h1>Disc Maker (Fixed Selection)</h1>
 
-<div id="tpOverlay">
-    <div class="popup">
-        <h3 style="color:var(--ios-blue)">THÀNH CÔNG!</h3>
-        <p style="font-size:12px; opacity:0.7">Nhập lệnh này trong Minecraft:</p>
-        <div id="tpCmd" style="background:#000; padding:15px; border-radius:15px; color:#00ff00; font-family:monospace; font-size:12px; margin:15px 0; word-break:break-all;"></div>
-        <button class="btn-convert" onclick="location.reload()" style="padding:10px 20px">XONG</button>
+    <div class="section">
+        <label>Tên Pack (Ví dụ: NhacCuaTui):</label>
+        <input type="text" id="packName" placeholder="BindzDiscPack">
     </div>
-</div>
 
-<div class="main-container">
-    <h1 class="shader-title">Architect 3D Pro Max</h1>
+    <div class="section">
+        <label>Chọn nhạc (MP3, OGG, WAV...):</label>
+        <div class="file-input-wrapper">
+            <input type="file" id="inputFile" accept=".mp3,audio/*">
+        </div>
+    </div>
 
-    <div class="menu-side">
-        <div class="input-group">
-            <label>Ảnh Pixel Art</label>
-            <input type="file" id="imgFile" accept="image/*">
-        </div>
-        <div class="input-group">
-            <label>Tên Project</label>
-            <input type="text" id="pName" placeholder="my_world_art">
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div class="input-group">
-                <label>X1 Start</label>
-                <input type="number" id="x1" value="0">
-            </div>
-            <div class="input-group">
-                <label>Z1 Start</label>
-                <input type="number" id="z1" value="0">
-            </div>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div class="input-group">
-                <label>X2 End</label>
-                <input type="number" id="x2" value="64">
-            </div>
-            <div class="input-group">
-                <label>Z2 End</label>
-                <input type="number" id="z2" value="64">
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Phiên bản</label>
-            <select id="ver">
-                <option value="1.21.0">Minecraft 1.21</option>
-                <option value="1.20.0">Minecraft 1.20</option>
+    <div class="section">
+        <label>Thay thế đĩa trong game:</label>
+        <div class="disc-preview-box">
+            <select id="discSelect">
+                <option value="13" data-url="13_JE2_BE2">Disc 13</option>
+                <option value="cat" data-url="Cat_JE2_BE2">Disc Cat</option>
+                <option value="blocks" data-url="Blocks_JE2_BE2">Disc Blocks</option>
+                <option value="chirp" data-url="Chirp_JE2_BE2">Disc Chirp</option>
+                <option value="far" data-url="Far_JE2_BE2">Disc Far</option>
+                <option value="mall" data-url="Mall_JE2_BE2">Disc Mall</option>
+                <option value="mellohi" data-url="Mellohi_JE2_BE2">Disc Mellohi</option>
+                <option value="stal" data-url="Stal_JE2_BE2">Disc Stal</option>
+                <option value="strad" data-url="Strad_JE2_BE2">Disc Strad</option>
+                <option value="ward" data-url="Ward_JE2_BE2">Disc Ward</option>
+                <option value="11" data-url="11_JE2_BE2">Disc 11</option>
+                <option value="wait" data-url="Wait_JE2_BE2">Disc Wait</option>
+                <option value="pigstep" data-url="Pigstep_JE1_BE1">Pigstep</option>
+                <option value="otherside" data-url="Otherside_JE1_BE1">Otherside</option>
+                <option value="5" data-url="5_JE1_BE1">Disc 5</option>
+                <option value="relic" data-url="Relic_JE1_BE1">Relic</option>
+                <option value="precipice" data-url="Precipice_JE1_BE1">Precipice</option>
+                <option value="creator" data-url="Creator_JE1_BE1">Creator</option>
             </select>
+            <img id="discImg" src="https://minecraft.wiki/images/Music_Disc_13_JE2_BE2.png" class="disc-icon">
         </div>
-        <button class="btn-convert" onclick="generatePack()">⚡ CONVERT MCPACK</button>
     </div>
 
-    <div class="preview-side" id="previewArea">
-        <canvas id="canvas3D"></canvas>
-        <span class="hint-3d">● GIỮ CHUỘT ĐỂ XOAY 3D ●</span>
-    </div>
+    <button id="craft" onclick="handleCraft()">CHẾ TẠO (.ZIP)</button>
+    <div id="status">Sẵn sàng!</div>
 </div>
 
 <script>
-    // --- KHỞI TẠO 3D ENGINE (Vanilla JS) ---
-    const canvas3d = document.getElementById('canvas3D');
-    const ctx3d = canvas3d.getContext('2d');
-    let rotation = { x: 0.5, y: 0.5 };
-    let isDragging = false, lastMouse = { x: 0, y: 0 };
+    const discSelect = document.getElementById('discSelect');
+    const discImg = document.getElementById('discImg');
 
-    function resizeCanvas() {
-        canvas3d.width = canvas3d.offsetWidth;
-        canvas3d.height = canvas3d.offsetHeight;
+    discSelect.addEventListener('change', () => {
+        const urlSuffix = discSelect.options[discSelect.selectedIndex].dataset.url;
+        discImg.src = `https://minecraft.wiki/images/Music_Disc_${urlSuffix}.png`;
+    });
+
+    // UUID luôn khác nhau mỗi lần nhấn nút (Theo yêu cầu)
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
-    window.onresize = resizeCanvas;
-    resizeCanvas();
 
-    // Mouse Controls
-    canvas3d.onmousedown = e => { isDragging = true; lastMouse = { x: e.clientX, y: e.clientY }; };
-    window.onmouseup = () => isDragging = false;
-    window.onmousemove = e => {
-        if (!isDragging) return;
-        rotation.y += (e.clientX - lastMouse.x) * 0.01;
-        rotation.x += (e.clientY - lastMouse.y) * 0.01;
-        lastMouse = { x: e.clientX, y: e.clientY };
-    };
-
-    // Vẽ 3D Grid & Ảnh
-    function draw3D() {
-        ctx3d.clearRect(0, 0, canvas3d.width, canvas3d.height);
-        const centerX = canvas3d.width / 2;
-        const centerY = canvas3d.height / 2;
-        const zoom = 150;
-
-        function project(x, y, z) {
-            let tx = x * Math.cos(rotation.y) - z * Math.sin(rotation.y);
-            let tz = x * Math.sin(rotation.y) + z * Math.cos(rotation.y);
-            let ty = y * Math.cos(rotation.x) - tz * Math.sin(rotation.x);
-            let finalZ = y * Math.sin(rotation.x) + tz * Math.cos(rotation.x);
-            let scale = 400 / (400 + finalZ);
-            return { x: centerX + tx * scale * zoom, y: centerY + ty * scale * zoom };
-        }
-
-        // Vẽ Khung vùng (X1, Z1 -> X2, Z2)
-        ctx3d.strokeStyle = '#007AFF';
-        ctx3d.lineWidth = 1;
-        const p1 = project(-0.5, 0, -0.5), p2 = project(0.5, 0, -0.5), p3 = project(0.5, 0, 0.5), p4 = project(-0.5, 0, 0.5);
-        ctx3d.beginPath(); ctx3d.moveTo(p1.x, p1.y); ctx3d.lineTo(p2.x, p2.y); ctx3d.lineTo(p3.x, p3.y); ctx3d.lineTo(p4.x, p4.y); ctx3d.closePath(); ctx3d.stroke();
+    async function handleCraft() {
+        const status = document.getElementById('status');
+        const btn = document.getElementById('craft');
+        const fileInput = document.getElementById('inputFile');
+        const packName = document.getElementById('packName').value || "BindzPack";
         
-        // Vẽ "mặt đất" mờ
-        ctx3d.fillStyle = 'rgba(0,122,255,0.1)'; ctx3d.fill();
-
-        // Vẽ biểu tượng ảnh nếu có
-        if (imgLoaded) {
-            ctx3d.globalAlpha = 0.8;
-            ctx3d.drawImage(offCanvas, p1.x, p1.y - 50, p3.x - p1.x, p3.y - p1.y + 50); // Fake projection
-            ctx3d.globalAlpha = 1.0;
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert("Bạn chưa chọn file nhạc hoặc trình duyệt không cho phép truy cập file!");
+            return;
         }
 
-        requestAnimationFrame(draw3D);
-    }
-    draw3D();
+        try {
+            btn.disabled = true;
+            status.innerText = "Đang xử lý dữ liệu...";
 
-    // --- LOGIC XỬ LÝ ẢNH & FILE ---
-    const imgFile = document.getElementById('imgFile');
-    const offCanvas = document.createElement('canvas');
-    const offCtx = offCanvas.getContext('2d');
-    let imgLoaded = false;
+            const file = fileInput.files[0];
+            const audioBuffer = await file.arrayBuffer();
+            
+            status.innerText = "Đang đóng gói ZIP...";
+            const zip = new JSZip();
 
-    imgFile.onchange = e => {
-        const reader = new FileReader();
-        reader.onload = ev => {
-            const img = new Image();
-            img.onload = () => {
-                offCanvas.width = 64; offCanvas.height = 64;
-                offCtx.drawImage(img, 0, 0, 64, 64);
-                imgLoaded = true;
+            // Manifest với UUID ngẫu nhiên mới hoàn toàn
+            const manifest = {
+                "format_version": 2,
+                "header": {
+                    "name": packName,
+                    "description": "Music Pack by Bindz",
+                    "uuid": generateUUID(), 
+                    "version": [1, 0, 0],
+                    "min_engine_version": [1, 16, 0]
+                },
+                "modules": [{
+                    "description": "Audio Module",
+                    "type": "resources",
+                    "uuid": generateUUID(), 
+                    "version": [1, 0, 0]
+                }]
             };
-            img.src = ev.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    };
 
-    function genUUID() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => (c=='x'?Math.random()*16|0:(Math.random()*16|0&0x3|0x8)).toString(16)); }
+            zip.file("manifest.json", JSON.stringify(manifest, null, 4));
+            const folder = zip.folder("sounds/music/game/records");
+            
+            // Đặt tên file đúng định dạng game nhận diện
+            folder.file(discSelect.value + ".ogg", audioBuffer);
 
-    async function generatePack() {
-        if(!imgLoaded) return alert("Chọn ảnh trước nhé!");
-        
-        const pName = document.getElementById('pName').value.toLowerCase().replace(/\s/g,'_') || "art_3d";
-        const x1 = parseInt(document.getElementById('x1').value);
-        const z1 = parseInt(document.getElementById('z1').value);
-        const x2 = parseInt(document.getElementById('x2').value);
-        const z2 = parseInt(document.getElementById('z2').value);
-        const ver = document.getElementById('ver').value.split('.').map(Number);
+            const blob = await zip.generateAsync({type: "blob"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = packName + ".zip";
+            link.click();
 
-        const zip = new JSZip();
-        const funcs = zip.folder("functions");
-
-        // Tạo lệnh xây dựng
-        let buildCmds = [];
-        const data = offCtx.getImageData(0,0,64,64).data;
-        const w = Math.abs(x2 - x1), h = Math.abs(z2 - z1);
-
-        for(let y=0; y<64; y++) {
-            for(let x=0; x<64; x++) {
-                const i = (y*64 + x)*4;
-                if(data[i+3] < 128) continue;
-                // Auto chọn block dựa trên màu
-                let block = "concrete 0";
-                if(data[i] < 50 && data[i+1] < 50) block = "black_concrete";
-                else if(data[i] > 180) block = "red_concrete";
-
-                // Map tọa độ vào vùng
-                let bx = x1 + (x * (x2 > x1 ? 1 : -1));
-                let bz = z1 + (y * (z2 > z1 ? 1 : -1));
-                buildCmds.push(`setblock ${bx} 150 ${bz} ${block}`);
-            }
+            status.innerText = "HOÀN THÀNH!";
+            status.style.color = "#3cf03c";
+        } catch (err) {
+            console.error(err);
+            status.innerText = "LỖI: " + err.message;
+            status.style.color = "red";
+        } finally {
+            btn.disabled = false;
         }
-
-        // Đóng gói theo yêu cầu
-        funcs.file(`${pName}.mcfunction`, buildCmds.join('\n'));
-        funcs.file("run_all.mcfunction", `function ${pName}`);
-        funcs.file("tick.mcfunction", `execute @a[tag=!built] ~ ~ ~ function ${pName}\ntag @a[tag=!built] add built`);
-        funcs.file("tick.json", JSON.stringify({"values":["tick"]}, null, 4));
-
-        zip.file("manifest.json", JSON.stringify({
-            format_version: 2,
-            header: { name: pName, uuid: genUUID(), version: [1,0,0], min_engine_version: ver },
-            modules: [{ type: "data", uuid: genUUID(), version: [1,0,0] }]
-        }, null, 4));
-
-        const content = await zip.generateAsync({type:"blob"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(content);
-        a.download = `${pName}.mcpack`;
-        a.click();
-
-        // Hiện TP
-        document.getElementById('tpCmd').innerText = `/tp @s ${x1} 152 ${z1}`;
-        document.getElementById('tpOverlay').style.display = 'flex';
     }
 </script>
+
 </body>
 </html>
