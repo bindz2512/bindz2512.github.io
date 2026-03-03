@@ -3,46 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Disc Maker - Fix Select File</title>
+    <title>Minecraft Disc Maker Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @import url('https://fonts.cdnfonts.com/css/minecraft-ia');
-        body { background: #313131; color: white; font-family: 'Minecraftia', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: #c6c6c6; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff; padding: 20px; width: 90%; max-width: 500px; box-shadow: 8px 8px 0px rgba(0,0,0,0.4); }
-        h1 { color: #3f3f3f; text-shadow: 2px 2px #fff; text-align: center; font-size: 0.9rem; margin-bottom: 15px; }
-        .section { background: #8b8b8b; border: 2px solid #373737; border-top-color: #fff; border-left-color: #fff; padding: 12px; margin-bottom: 10px; color: #000; }
-        label { display: block; margin-bottom: 5px; font-size: 0.75rem; font-weight: bold; }
-        input[type="text"], select { width: 100%; padding: 10px; background: #000; border: 2px solid #fff; color: #3cf03c; font-family: 'Minecraftia', sans-serif; box-sizing: border-box; font-size: 0.8rem; }
-        /* Tùy chỉnh nút chọn file cho dễ bấm */
-        .file-input-wrapper { margin-top: 5px; }
-        input[type="file"] { width: 100%; color: #000; font-size: 0.7rem; background: #eee; padding: 5px; border: 1px inset #000; }
-        .disc-preview-box { display: flex; align-items: center; gap: 15px; margin-top: 10px; }
-        .disc-icon { width: 42px; height: 42px; image-rendering: pixelated; background: #555; border: 2px solid #000; padding: 4px; }
-        button#craft { width: 100%; padding: 15px; background: #3c8527; border: 3px solid #000; border-top-color: #5fb343; border-left-color: #5fb343; color: white; font-family: 'Minecraftia', sans-serif; cursor: pointer; margin-top: 10px; text-shadow: 2px 2px #000; }
+        body { background: #313131; color: white; font-family: 'Minecraftia', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; box-sizing: border-box; }
+        .container { background: #c6c6c6; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff; padding: 15px; width: 100%; max-width: 450px; box-shadow: 8px 8px 0px rgba(0,0,0,0.4); }
+        h1 { color: #3f3f3f; text-shadow: 2px 2px #fff; text-align: center; font-size: 0.85rem; margin: 0 0 15px 0; }
+        .section { background: #8b8b8b; border: 2px solid #373737; border-top-color: #fff; border-left-color: #fff; padding: 10px; margin-bottom: 10px; color: #000; }
+        label { display: block; margin-bottom: 5px; font-size: 0.7rem; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 8px; background: #000; border: 2px solid #fff; color: #3cf03c; font-family: 'Minecraftia', sans-serif; box-sizing: border-box; font-size: 0.75rem; }
+        input[type="file"] { width: 100%; color: #000; font-size: 0.65rem; background: #ddd; padding: 5px; border: 1px inset #000; cursor: pointer; }
+        .flex-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .disc-icon { width: 40px; height: 40px; image-rendering: pixelated; background: #555; border: 2px solid #000; padding: 2px; }
+        button#craft { width: 100%; padding: 12px; background: #3c8527; border: 3px solid #000; border-top-color: #5fb343; border-left-color: #5fb343; color: white; font-family: 'Minecraftia', sans-serif; cursor: pointer; margin-top: 5px; text-shadow: 2px 2px #000; font-size: 0.8rem; }
         button#craft:active { border-top-color: #000; border-left-color: #000; background: #2d661e; }
-        #status { text-align: center; font-size: 0.65rem; margin-top: 10px; color: #444; }
+        #status { text-align: center; font-size: 0.6rem; margin-top: 10px; color: #444; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Disc Maker (Fixed Selection)</h1>
+    <h1>Disc Maker v1.21 (Universal)</h1>
 
     <div class="section">
-        <label>Tên Pack (Ví dụ: NhacCuaTui):</label>
-        <input type="text" id="packName" placeholder="BindzDiscPack">
+        <label>Tên Gói (Không dấu):</label>
+        <input type="text" id="packName" placeholder="MyMusicPack">
     </div>
 
     <div class="section">
-        <label>Chọn nhạc (MP3, OGG, WAV...):</label>
-        <div class="file-input-wrapper">
-            <input type="file" id="inputFile" accept=".mp3,audio/*">
-        </div>
+        <label>Phiên bản Minecraft:</label>
+        <select id="versionSelect">
+            <option value="1.21">Minecraft 1.21+</option>
+            <option value="1.20">Minecraft 1.20</option>
+            <option value="1.19">Minecraft 1.19</option>
+            <option value="1.18">Minecraft 1.18</option>
+            <option value="1.17">Minecraft 1.17</option>
+            <option value="1.16">Minecraft 1.16</option>
+        </select>
     </div>
 
     <div class="section">
-        <label>Thay thế đĩa trong game:</label>
-        <div class="disc-preview-box">
+        <label>Chọn file nhạc (MP3, WAV, OGG...):</label>
+        <input type="file" id="inputFile" accept="audio/*,.mp3,.ogg,.wav">
+    </div>
+
+    <div class="section">
+        <label>Thay thế đĩa nào:</label>
+        <div class="flex-row">
             <select id="discSelect">
                 <option value="13" data-url="13_JE2_BE2">Disc 13</option>
                 <option value="cat" data-url="Cat_JE2_BE2">Disc Cat</option>
@@ -62,25 +70,24 @@
                 <option value="relic" data-url="Relic_JE1_BE1">Relic</option>
                 <option value="precipice" data-url="Precipice_JE1_BE1">Precipice</option>
                 <option value="creator" data-url="Creator_JE1_BE1">Creator</option>
+                <option value="creator_music_box" data-url="Creator_%28Music_Box%29_JE1_BE1">Music Box</option>
             </select>
             <img id="discImg" src="https://minecraft.wiki/images/Music_Disc_13_JE2_BE2.png" class="disc-icon">
         </div>
     </div>
 
     <button id="craft" onclick="handleCraft()">CHẾ TẠO (.ZIP)</button>
-    <div id="status">Sẵn sàng!</div>
+    <div id="status">Sẵn sàng! Hãy chọn file nhạc của bạn.</div>
 </div>
 
 <script>
-    const discSelect = document.getElementById('discSelect');
-    const discImg = document.getElementById('discImg');
-
-    discSelect.addEventListener('change', () => {
-        const urlSuffix = discSelect.options[discSelect.selectedIndex].dataset.url;
-        discImg.src = `https://minecraft.wiki/images/Music_Disc_${urlSuffix}.png`;
+    // Cập nhật ảnh đĩa khi chọn
+    document.getElementById('discSelect').addEventListener('change', function() {
+        const urlSuffix = this.options[this.selectedIndex].dataset.url;
+        document.getElementById('discImg').src = `https://minecraft.wiki/images/Music_Disc_${urlSuffix}.png`;
     });
 
-    // UUID luôn khác nhau mỗi lần nhấn nút (Theo yêu cầu)
+    // Hàm tạo UUID ngẫu nhiên theo yêu cầu (luôn khác nhau)
     function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             const r = Math.random() * 16 | 0;
@@ -93,57 +100,62 @@
         const status = document.getElementById('status');
         const btn = document.getElementById('craft');
         const fileInput = document.getElementById('inputFile');
-        const packName = document.getElementById('packName').value || "BindzPack";
+        const packName = document.getElementById('packName').value.trim() || "BindzMusic";
+        const selectedVer = document.getElementById('versionSelect').value;
+        const discName = document.getElementById('discSelect').value;
         
-        if (!fileInput.files || fileInput.files.length === 0) {
-            alert("Bạn chưa chọn file nhạc hoặc trình duyệt không cho phép truy cập file!");
+        if (!fileInput.files[0]) {
+            alert("Vui lòng chọn 1 file nhạc trước!");
             return;
         }
 
         try {
             btn.disabled = true;
-            status.innerText = "Đang xử lý dữ liệu...";
+            status.innerText = "Đang xử lý âm thanh...";
 
             const file = fileInput.files[0];
             const audioBuffer = await file.arrayBuffer();
-            
-            status.innerText = "Đang đóng gói ZIP...";
             const zip = new JSZip();
 
             // Manifest với UUID ngẫu nhiên mới hoàn toàn
             const manifest = {
                 "format_version": 2,
                 "header": {
-                    "name": packName,
-                    "description": "Music Pack by Bindz",
-                    "uuid": generateUUID(), 
+                    "name": `${packName} [${selectedVer}]`,
+                    "description": `Đĩa nhạc tùy chỉnh cho bản ${selectedVer}`,
+                    "uuid": generateUUID(),
                     "version": [1, 0, 0],
                     "min_engine_version": [1, 16, 0]
                 },
                 "modules": [{
-                    "description": "Audio Module",
+                    "description": "Audio",
                     "type": "resources",
-                    "uuid": generateUUID(), 
+                    "uuid": generateUUID(),
                     "version": [1, 0, 0]
                 }]
             };
 
             zip.file("manifest.json", JSON.stringify(manifest, null, 4));
-            const folder = zip.folder("sounds/music/game/records");
-            
-            // Đặt tên file đúng định dạng game nhận diện
-            folder.file(discSelect.value + ".ogg", audioBuffer);
 
+            // Logic đa phiên bản: Đưa nhạc vào cả 2 đường dẫn để chắc chắn hoạt động
+            // Đường dẫn 1: Cho bản cũ
+            const pathOld = zip.folder("sounds/music/game/records");
+            pathOld.file(discName + ".ogg", audioBuffer);
+            
+            // Đường dẫn 2: Cho bản mới (một số bản Bedrock mới yêu cầu cấu trúc này)
+            const pathNew = zip.folder("sounds/sounds/music/game/records");
+            pathNew.file(discName + ".ogg", audioBuffer);
+
+            // Xuất ZIP
             const blob = await zip.generateAsync({type: "blob"});
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = packName + ".zip";
+            link.download = `${packName}_MC${selectedVer}.zip`;
             link.click();
 
-            status.innerText = "HOÀN THÀNH!";
+            status.innerText = "HOÀN THÀNH!\nNếu là iOS: Hãy giải nén file ZIP rồi đưa vào thư mục resource_packs.";
             status.style.color = "#3cf03c";
         } catch (err) {
-            console.error(err);
             status.innerText = "LỖI: " + err.message;
             status.style.color = "red";
         } finally {
